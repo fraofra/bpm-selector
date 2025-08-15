@@ -8,7 +8,7 @@ API_TEAMS = f"{API_BASE}/teams/"
 API_STATS = f"{API_BASE}/stats/"
 
 st.set_page_config(page_title="BPM - Selettore Chicchette", layout="centered")
-st.title("⚽ BPM Selector ⚽")
+st.title("⚽ BPM Selector")
 
 # --- Carica le leghe ---
 @st.cache_data
@@ -17,14 +17,14 @@ def carica_leghe():
         response = requests.get(API_LEAGUES)
         response.raise_for_status()
         leagues = response.json().get("leagues", [])
-        
+        leagues = [league.replace("_"," ").title() for league in leagues]        
         return sorted(leagues)
     except Exception as e:
         st.error(f"Errore nel caricamento delle leghe: {e}")
         return []
 
-leagues_all = carica_leghe()
-leagues = leagues_all.replace("_", " ")
+leagues = carica_leghe()
+
 lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 # --- Carica le squadre ---
