@@ -1,13 +1,14 @@
 import streamlit as st
 import requests
 import urllib.parse
+from datetime import datetime
 
 API_BASE = "https://daily-python-script.onrender.com"
 API_LEAGUES = f"{API_BASE}/leagues"
 API_TEAMS = f"{API_BASE}/teams/"
 API_STATS = f"{API_BASE}/stats/"
 
-st.set_page_config(page_title="BPM - Selettore Chicchette", layout="centered")
+st.set_page_config(page_title="BPM - Limited Chicchette", layout="centered")
 st.title("⚽ BPM Selector")
 
 # --- Carica le leghe ---
@@ -26,6 +27,33 @@ def carica_leghe():
 leagues = carica_leghe()
 
 lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
+
+
+@st.cache_data
+def get_partite_oggi():
+    try:
+        response = requests.get("https://daily-python-script.onrender.com/next")
+        response.raise_for_status()
+        dati = response.json()
+        match_list = dati.get("next_matches", [])
+
+        oggi = datetime.now().strftime("%d.%m.")
+
+        partite_oggi = [
+            {
+                "home_team": match["home_team"],
+                "away_team": match["away_team"],
+                "league": match["league"],
+                "ora": match["date"]
+            }
+            for match in match_list
+            if match.get("date", "").startswith(oggi)
+        ]
+
+        return partite_oggi
+    except Exception as e:
+        st.error(f"Errore nel recupero delle partite odierne: {e}")
+        return []
 
 # --- Carica le squadre ---
 def get_teams(lega):
@@ -129,3 +157,45 @@ if teams and st.button("Avvia la ricerca su tutte le squadre"):
         for idx, team in enumerate(teams):
             st.markdown(analizza_squadra(team, lega_selezionata))
         st.success("Analisi completata!")
+
+if st.button("Analizza le partite di oggi"):
+    partite = get_partite_oggi()
+
+    if partite:
+        st.subheader("📋 Partite di oggi (clicca per espandere)")
+
+        partite.sort(key=lambda x: x["ora"].split()[-1])  # Ordina per orario
+
+        for match in partite:
+            home = match["home_team"]
+            away = match["away_team"]
+            orario = match["ora"].split()[-1]
+            campionato = match["league"]
+            campionato_nome = campionato.replace("_", " ").title()
+
+            titolo = f"⚽ {orario} - {campionato_nome}: {home} vs {away}"
+            key_match = f"{home}_{away}_{orario.replace(':','')}"
+
+            if key_match not in st.session_state:
+                st.session_state[key_match] = False
+
+            with st.expander(titolo):
+                # Se ancora non analizzato, esegui analisi
+                if not st.session_state[key_match]:
+                    with st.spinner("Analisi in corso..."):
+                        home_analysis = analizza_squadra(home, campionato)
+                        away_analysis = analizza_squadra(away, campionato)
+                        st.session_state[f"{key_match}_home"] = home_analysis
+                        st.session_state[f"{key_match}_away"] = away_analysis
+                        st.session_state[key_match] = True  # Flag per evitare riesecuzione
+
+                # Mostra analisi già fatte
+                st.markdown(f"### {home}")
+                st.markdown(st.session_state.get(f"{key_match}_home", "Nessun dato"))
+
+                st.markdown(f"### {away}")
+                st.markdown(st.session_state.get(f"{key_match}_away", "Nessun dato"))
+
+        st.info("ℹ️ Analisi eseguita alla prima espansione.")
+    else:
+        st.info("🕊️ Nessuna partita in programma per oggi.")
