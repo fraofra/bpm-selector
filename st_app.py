@@ -8,7 +8,7 @@ API_TEAMS = f"{API_BASE}/teams/"
 API_STATS = f"{API_BASE}/stats/"
 
 st.set_page_config(page_title="BPM - Selettore Chicchette", layout="centered")
-st.title("⚽ BPM - Chicchette Selector")
+st.title("⚽ BPM Selector ⚽")
 
 # --- Carica le leghe ---
 @st.cache_data
@@ -113,9 +113,9 @@ def analizza_squadra(team, lega):
             message += f"  - Non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n"
 
         if consecutivi_non_segna == max_non_segna and max_non_segna > 0:
-            message += f"  ⚠ Mai più di {max_non_segna} partite senza segnare\n"
+            message += f"\n ⚠ Mai più di {max_non_segna} partite senza segnare\n"
         if consecutivi_non_subisce == max_non_subisce and max_non_subisce > 0:
-            message += f"  ⚠ Mai più di {max_non_subisce} clean sheet\n"
+            message += f"\n ⚠ Mai più di {max_non_subisce} clean sheet\n"
 
         return message
     except Exception as e:
