@@ -127,5 +127,5 @@ def analizza_squadra(team, lega):
 if teams and st.button("Avvia la ricerca su tutte le squadre"):
     with st.spinner("Analisi in corso..."):
         for idx, team in enumerate(teams):
-            st.markdown(analizza_squadra(team, lega_selezionata))
+            st.markdown(analizza_squadra(team, lega_selezionata.replace(" ","_").lower()))
         st.success("Analisi completata!")
