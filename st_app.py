@@ -17,13 +17,14 @@ def carica_leghe():
         response = requests.get(API_LEAGUES)
         response.raise_for_status()
         leagues = response.json().get("leagues", [])
-        leagues = [league.replace("_"," ").title() for league in leagues]
+        
         return sorted(leagues)
     except Exception as e:
         st.error(f"Errore nel caricamento delle leghe: {e}")
         return []
 
-leagues = carica_leghe()
+leagues_all = carica_leghe()
+leagues = leagues_all.replace("_", " ")
 lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 # --- Carica le squadre ---
