@@ -18,9 +18,10 @@ with st.sidebar:
         response = requests.get(API_LEAGUES)
         response.raise_for_status()
         leagues = response.json().get("leagues", [])
+        leagues = [league.replace("_", " ").title() for league in leagues]
         leagues.sort()
 
-        selected_league = st.selectbox("Campionato", leagues).replace("_", " ").title
+        selected_league = st.selectbox("Campionato", leagues)
     except Exception as e:
         st.error(f"Errore nel caricamento delle leghe: {e}")
         selected_league = None
