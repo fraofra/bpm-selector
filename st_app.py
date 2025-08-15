@@ -29,6 +29,7 @@ lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 # --- Carica le squadre ---
 def get_teams(lega):
+    lega = lega.replace(" ","_").lower()
     try:
         response = requests.get(f"{API_TEAMS}{lega}")
         response.raise_for_status()
