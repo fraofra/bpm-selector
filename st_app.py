@@ -197,20 +197,28 @@ if st.button("Analizza le partite di oggi"):
                         st.session_state[key_match] = True  # Flag per evitare riesecuzione
 
                 # Mostra analisi già fatte
-                st.markdown(f"## {home}")
+                st.markdown(f"{home}")
                 st.markdown(st.session_state.get(f"{key_match}_home", "Nessun dato"))
 
-                st.markdown(f"## {away}")
+                st.markdown(f"{away}")
                 st.markdown(st.session_state.get(f"{key_match}_away", "Nessun dato"))
 
         st.info("ℹ️ Analisi eseguita alla prima espansione.")
     else:
         st.info("🕊️ Nessuna partita in programma per oggi.")
 
-    if st.button("📣 Mostra Alert di Oggi"):
-        if st.session_state.alert_list:
-            st.subheader("⚠️ Alert generati oggi")
-            for alert in st.session_state.alert_list:
-                st.markdown(f"- {alert}")
-        else:
-            st.info("Nessun alert generato oggi.")
+# --- Mostra alert di oggi ---
+if "show_alerts" not in st.session_state:
+    st.session_state.show_alerts = False
+
+if st.button("📣 Mostra Alert di Oggi"):
+    st.session_state.show_alerts = True  # ✅ Ricorda che vogliamo vedere gli alert
+
+if st.session_state.show_alerts:
+    if st.session_state.alert_list:
+        st.subheader("⚠️ Alert generati oggi")
+        for alert in st.session_state.alert_list:
+            st.markdown(f"- {alert}")
+    else:
+        st.info("Nessun alert generato oggi.")
+
