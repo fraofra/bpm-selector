@@ -7,6 +7,8 @@ API_BASE = "https://daily-python-script.onrender.com"
 API_LEAGUES = f"{API_BASE}/leagues"
 API_TEAMS = f"{API_BASE}/teams/"
 API_STATS = f"{API_BASE}/stats/"
+if "alert_list" not in st.session_state:
+    st.session_state.alert_list = []
 
 st.set_page_config(page_title="BPM - Limited Chicchette", layout="centered")
 st.title("⚽ BPM Selector")
@@ -139,13 +141,17 @@ def analizza_squadra(team, lega):
 
         if consecutivi_non_segna > 0:
             message += f"  - Non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n"
+            st.session_state.alert_list.append(f"{team} non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n")
         if consecutivi_non_subisce > 0:
             message += f"  - Non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n"
+            st.session_state.alert_list.append(f"{team} non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n")
 
         if consecutivi_non_segna == max_non_segna and max_non_segna > 0:
             message += f"\n ⚠ Mai più di {max_non_segna} partite senza segnare\n"
+            st.session_state.alert_list.append(f"{team} ⚠ Mai più di {max_non_segna} partite senza segnare\n")
         if consecutivi_non_subisce == max_non_subisce and max_non_subisce > 0:
             message += f"\n ⚠ Mai più di {max_non_subisce} clean sheet\n"
+            st.session_state.alert_list.append(f"{team} ⚠ Mai più di {max_non_subisce} partite senza subire\n")
 
         return message
     except Exception as e:
@@ -155,10 +161,11 @@ def analizza_squadra(team, lega):
 if teams and st.button("Avvia la ricerca su tutte le squadre"):
     with st.spinner("Analisi in corso..."):
         for idx, team in enumerate(teams):
-            st.markdown(analizza_squadra(team, lega_selezionata.replace(" ","_").lower()))
+            st.markdown(analizza_squadra(team, lega_selezionata))
         st.success("Analisi completata!")
 
 if st.button("Analizza le partite di oggi"):
+    st.session_state.alert_list = []  # ✅ resetta gli alert all'avvio
     partite = get_partite_oggi()
 
     if partite:
@@ -190,12 +197,20 @@ if st.button("Analizza le partite di oggi"):
                         st.session_state[key_match] = True  # Flag per evitare riesecuzione
 
                 # Mostra analisi già fatte
-                st.markdown(f"### {home}")
+                st.markdown(f"## {home}")
                 st.markdown(st.session_state.get(f"{key_match}_home", "Nessun dato"))
 
-                st.markdown(f"### {away}")
+                st.markdown(f"## {away}")
                 st.markdown(st.session_state.get(f"{key_match}_away", "Nessun dato"))
 
         st.info("ℹ️ Analisi eseguita alla prima espansione.")
     else:
         st.info("🕊️ Nessuna partita in programma per oggi.")
+
+    if st.button("📣 Mostra Alert di Oggi"):
+        if st.session_state.alert_list:
+            st.subheader("⚠️ Alert generati oggi")
+            for alert in st.session_state.alert_list:
+                st.markdown(f"- {alert}")
+        else:
+            st.info("Nessun alert generato oggi.")
