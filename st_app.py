@@ -141,17 +141,17 @@ def analizza_squadra(team, lega):
 
         if consecutivi_non_segna > 0:
             message += f"  - Non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n"
-            st.session_state.alert_list.append(f"{team} non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n")
+            # st.session_state.alert_list.append(f"{team} non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n")
         if consecutivi_non_subisce > 0:
             message += f"  - Non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n"
-            st.session_state.alert_list.append(f"{team} non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n")
+            # st.session_state.alert_list.append(f"{team} non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n")
 
         if consecutivi_non_segna == max_non_segna and max_non_segna > 0:
             message += f"\n ⚠ Mai più di {max_non_segna} partite senza segnare\n"
-            st.session_state.alert_list.append(f"{team} ⚠ Mai più di {max_non_segna} partite senza segnare\n")
+            st.session_state.alert_list.append(f"{lega} - {team} \n ⚠ Limite non segna ({max_non_segna} in {match_count} partite)\n")
         if consecutivi_non_subisce == max_non_subisce and max_non_subisce > 0:
             message += f"\n ⚠ Mai più di {max_non_subisce} clean sheet\n"
-            st.session_state.alert_list.append(f"{team} ⚠ Mai più di {max_non_subisce} partite senza subire\n")
+            st.session_state.alert_list.append(f"{lega} - {team}\n ⚠ Limite non subisce ({max_non_subisce} in {match_count} partite)\n")
 
         return message
     except Exception as e:
@@ -221,4 +221,3 @@ if st.session_state.show_alerts:
             st.markdown(f"- {alert}")
     else:
         st.info("Nessun alert generato oggi.")
-
