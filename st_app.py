@@ -181,7 +181,7 @@ if st.button("Analizza le partite di oggi"):
             campionato = match["league"]
             campionato_nome = campionato.replace("_", " ").title()
 
-            titolo = f"⚽ {orario} - {campionato_nome}: {home} vs {away}"
+            titolo = f"⚽ {orario} - {home} vs {away}\n{campionato_nome}"
             key_match = f"{home}_{away}_{orario.replace(':','')}"
 
             if key_match not in st.session_state:
