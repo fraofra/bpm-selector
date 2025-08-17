@@ -31,7 +31,7 @@ leagues = carica_leghe()
 lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 
-@st.cache_data
+# @st.cache_data
 def get_partite_oggi():
     try:
         response = requests.get("https://daily-python-script.onrender.com/next")
