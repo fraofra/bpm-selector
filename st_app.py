@@ -365,19 +365,19 @@ if st.button("📋 Quote di oggi"):
                 if not st.session_state[key_match_p]:
                     with st.spinner("Analisi in corso..."):
                         try:
-                            home_analysis = calcola_quote_poisson(home, away, campionato)
+                            poisson_analysis = calcola_quote_poisson(home, away, campionato)
                         except:
                             continue
-                        st.session_state[f"{key_match_p}_home"] = home_analysis
+                        st.session_state[f"{key_match_p}_poisson"] = poisson_analysis
 
                         st.session_state[key_match_p] = True  # Flag per evitare riesecuzione
 
                 # Mostra analisi già fatte
                 st.markdown(f"{home} - {away}")
-                st.markdown(st.session_state.get(f"{key_match_p}_home", "Nessun dato"))
+                st.markdown(st.session_state.get(f"{key_match_p}_poisson", "Nessun dato"))
 
 
-        st.info("ℹ️ Analisi eseguita alla prima espansione.")
+        st.info("ℹ️ Analisi eseguita con successo.")
     else:
         st.info("🕊️ Nessuna partita in programma per oggi.")
 
@@ -395,3 +395,11 @@ if st.session_state.show_alerts:
             st.markdown(f"- {alert}")
     else:
         st.info("Nessun alert generato oggi.. analizza le partite")
+
+# Footer
+st.divider()
+st.markdown("""
+    <center>
+    <small>Made with ❤️ for BasePizza • </small>
+    </center>
+""", unsafe_allow_html=True)
