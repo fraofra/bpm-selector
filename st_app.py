@@ -204,7 +204,7 @@ if st.button("Analizza le partite di oggi"):
                 st.markdown(f"{away}")
                 st.markdown(st.session_state.get(f"{key_match}_away", "Nessun dato"))
 
-        st.info("ℹ️ Analisi eseguita alla prima espansione.")
+        st.info("ℹ️ Analisi eseguita con successo.")
     else:
         st.info("🕊️ Nessuna partita in programma per oggi.")
 
