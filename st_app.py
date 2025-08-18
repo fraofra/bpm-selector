@@ -310,7 +310,7 @@ if st.button("📊 Analizza le partite di oggi"):
             campionato_nome = campionato.replace("_", " ").title()
 
             titolo = f"⚽ {orario} - {campionato_nome}: {home} vs {away}"
-            key_match = f"{home}_{away}_{orario.replace(':','')}"
+            key_match = f"analysis_{home}_{away}_{orario.replace(':','')}"
 
             if key_match not in st.session_state:
                 st.session_state[key_match] = False
@@ -355,7 +355,7 @@ if st.button("📋 Quote di oggi"):
             campionato_nome = campionato.replace("_", " ").title()
 
             titolo = f"⚽ {orario} - {campionato_nome}: {home} vs {away}"
-            key_match_p = f"{home}_{away}_{orario.replace(':','')}"
+            key_match_p = f"poisson_{home}_{away}_{orario.replace(':','')}"
 
             if key_match_p not in st.session_state:
                 st.session_state[key_match_p] = False
