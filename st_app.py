@@ -14,6 +14,126 @@ if "alert_list" not in st.session_state:
 st.set_page_config(page_title="BPM - Limited Chicchette", layout="centered")
 st.title("⚽ BPM Selector")
 
+# --- CUSTOM CSS BETTING STYLE COMPLETO ---
+st.markdown("""
+<style>
+/* Sfondo generale */
+.stApp {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #f8f9fa;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Titolo principale */
+h1 {
+    color: #00ff88;
+    text-align: center;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0,255,136,0.5);
+}
+
+/* Expander stile card */
+.streamlit-expander {
+
+    margin-bottom: 12px;
+    background-color: rgba(255,255,255,0.03);
+    box-shadow: 0 4px 10px rgba(0,255,136,0.15);
+}
+.streamlit-expanderHeader {
+    font-weight: 700 !important;
+    color: #00ff88 !important;
+}
+
+/* Pulsanti potenti */
+.stButton>button {
+    width: 100% !important;  /* stessa larghezza del selectbox */
+    background: linear-gradient(90deg, #ff512f, #dd2476);
+    color: white;
+    border-radius: 12px;
+    padding: 0.6em 1.4em;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: none;
+    box-shadow: 0 6px 14px rgba(221,36,118,0.4);
+    transition: all 0.2s ease-in-out;
+}
+.stButton>button:hover {
+    background: linear-gradient(90deg, #dd2476, #ff512f);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(221,36,118,0.6);
+}
+
+/* Selectbox (combo) */
+div[data-baseweb="select"] {
+    background: linear-gradient(90deg, #ff512f, #dd2476) !important;
+    border: 1px solid #00ff88 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 10px rgba(221,36,118,0.3);
+    transition: all 0.2s ease-in-out;
+}
+div[data-baseweb="select"] div[role="button"] {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+div[data-baseweb="select"] input {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+div[data-baseweb="select"]:hover {
+    background: linear-gradient(90deg, #dd2476, #ff512f) !important;
+    box-shadow: 0 6px 14px rgba(221,36,118,0.5);
+}
+/* Dropdown menu */
+ul {
+    background-color: #1e2a30 !important;
+    border-radius: 10px;
+    border: 1px solid #00ff88;
+}
+ul li {
+    color: #f8f9fa !important;
+    font-weight: 500;
+}
+ul li:hover {
+    background-color: rgba(0,255,136,0.15) !important;
+    color: #00ff88 !important;
+    font-weight: 600;
+}
+
+/* Messaggi di alert/info/success */
+.stAlert {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 12px;
+}
+.stAlert [data-baseweb="notification"] {
+    color: #fff !important;
+}
+.stAlert[data-testid="stAlert-success"] {
+    background-color: rgba(0, 255, 136, 0.15);
+    border-left: 6px solid #00ff88;
+}
+.stAlert[data-testid="stAlert-error"] {
+    background-color: rgba(255, 77, 77, 0.15);
+    border-left: 6px solid #ff4d4d;
+}
+.stAlert[data-testid="stAlert-info"] {
+    background-color: rgba(255, 221, 51, 0.15);
+    border-left: 6px solid #ffdd33;
+}
+
+/* Divider */
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, #00ff88, #dd2476, #ffdd33);
+    margin: 20px 0;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+
 # --- Carica le leghe ---
 @st.cache_data
 def carica_leghe():
@@ -139,13 +259,13 @@ def analizza_squadra(team, lega):
             else:
                 consecutivi_non_subisce = 0
 
-        message += f"\n**{team}**\n- Partite giocate: {match_count}\n- Fatti: {scored} | Subiti: {conceded}\n- W: {win} | L: {lose} | D: {draw}\n"
+        message += f"\n- Partite giocate: {match_count}\n- Fatti: {scored} | Subiti: {conceded}\n- W: {win} | L: {lose} | D: {draw}\n"
 
         if consecutivi_non_segna > 0:
-            message += f"  - Non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n"
+            message += f"\n- Non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n"
             # st.session_state.alert_list.append(f"{team} non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n")
         if consecutivi_non_subisce > 0:
-            message += f"  - Non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n"
+            message += f"\n- Non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n"
             # st.session_state.alert_list.append(f"{team} non subisce da {consecutivi_non_subisce} (Max: {max_non_subisce})\n")
 
         if consecutivi_non_segna == max_non_segna and max_non_segna > 0:
@@ -286,22 +406,33 @@ def get_info(team, lega):
     except Exception as e:
         return f"❌ Errore durante analisi {team}: {e}"
 
-# --- Avvia analisi su tutte le squadre ---
-if teams and st.button("Avvia la ricerca sul campionato"):
+# --- Toggle per analisi completo campionato ---
+if "show_league_analysis" not in st.session_state:
+    st.session_state.show_league_analysis = False
+
+if st.button(" 🔍 Avvia la ricerca sul campionato"):
+    st.session_state.show_league_analysis = not st.session_state.show_league_analysis
+
+if st.session_state.show_league_analysis and teams:
     with st.spinner("Analisi in corso..."):
         for idx, team in enumerate(teams):
             st.markdown(analizza_squadra(team, lega_selezionata.replace(" ","_").lower()))
         st.success("Analisi completata!")
 
-if st.button("📊 Analizza le partite di oggi"):
-    st.session_state.alert_list = []  # ✅ resetta gli alert all'avvio
+
+# --- Toggle per analisi partite di oggi ---
+if "show_today_analysis" not in st.session_state:
+    st.session_state.show_today_analysis = False
+
+if st.button(" 📊 Analizza le partite di oggi"):
+    st.session_state.show_today_analysis = not st.session_state.show_today_analysis
+    st.session_state.alert_list = []  # reset alert all'avvio
+
+if st.session_state.show_today_analysis:
     partite = get_partite_oggi()
-
     if partite:
-        st.subheader("📋 Partite di oggi (clicca per espandere)")
-
-        partite.sort(key=lambda x: x["ora"].split()[-1])  # Ordina per orario
-
+        st.subheader("📋 Partite di oggi")
+        partite.sort(key=lambda x: x["ora"].split()[-1])
         for match in partite:
             home = match["home_team"]
             away = match["away_team"]
@@ -316,37 +447,32 @@ if st.button("📊 Analizza le partite di oggi"):
                 st.session_state[key_match] = False
 
             with st.expander(titolo):
-                # Se ancora non analizzato, esegui analisi
                 if not st.session_state[key_match]:
                     with st.spinner("Analisi in corso..."):
                         home_analysis = analizza_squadra(home, campionato)
                         away_analysis = analizza_squadra(away, campionato)
                         st.session_state[f"{key_match}_home"] = home_analysis
                         st.session_state[f"{key_match}_away"] = away_analysis
-                        st.session_state[key_match] = True  # Flag per evitare riesecuzione
+                        st.session_state[key_match] = True
 
-                # Mostra analisi già fatte
-                st.markdown(f"{home}")
+                st.markdown(f"***{home}***")
                 st.markdown(st.session_state.get(f"{key_match}_home", "Nessun dato"))
-
-                st.markdown(f"{away}")
+                st.markdown(f"***{away}***")
                 st.markdown(st.session_state.get(f"{key_match}_away", "Nessun dato"))
 
-        st.info("ℹ️ Analisi eseguita alla prima espansione.")
-    else:
-        st.info("🕊️ Nessuna partita in programma per oggi.")
 
-
-
+# --- Toggle per quote di oggi ---
+if "show_today_poisson" not in st.session_state:
+    st.session_state.show_today_poisson = False
 
 if st.button("📋 Quote di oggi"):
-    partite = get_partite_oggi()
+    st.session_state.show_today_poisson = not st.session_state.show_today_poisson
 
+if st.session_state.show_today_poisson:
+    partite = get_partite_oggi()
     if partite:
         st.subheader("Quote di oggi (clicca per espandere)")
-
-        partite.sort(key=lambda x: x["ora"].split()[-1])  # Ordina per orario
-
+        partite.sort(key=lambda x: x["ora"].split()[-1])
         for match in partite:
             home = match["home_team"]
             away = match["away_team"]
@@ -361,7 +487,6 @@ if st.button("📋 Quote di oggi"):
                 st.session_state[key_match_p] = False
 
             with st.expander(titolo):
-                # Se ancora non analizzato, esegui analisi
                 if not st.session_state[key_match_p]:
                     with st.spinner("Analisi in corso..."):
                         try:
@@ -369,24 +494,18 @@ if st.button("📋 Quote di oggi"):
                         except:
                             continue
                         st.session_state[f"{key_match_p}_poisson"] = poisson_analysis
+                        st.session_state[key_match_p] = True
 
-                        st.session_state[key_match_p] = True  # Flag per evitare riesecuzione
-
-                # Mostra analisi già fatte
                 st.markdown(f"{home} - {away}")
                 st.markdown(st.session_state.get(f"{key_match_p}_poisson", "Nessun dato"))
 
 
-        st.info("ℹ️ Analisi eseguita con successo.")
-    else:
-        st.info("🕊️ Nessuna partita in programma per oggi.")
-
-# --- Mostra alert di oggi ---
+# --- Toggle per alert di oggi ---
 if "show_alerts" not in st.session_state:
     st.session_state.show_alerts = False
 
 if st.button("📣 Mostra Alert di Oggi"):
-    st.session_state.show_alerts = True  # ✅ Ricorda che vogliamo vedere gli alert
+    st.session_state.show_alerts = not st.session_state.show_alerts
 
 if st.session_state.show_alerts:
     if st.session_state.alert_list:
@@ -395,6 +514,7 @@ if st.session_state.show_alerts:
             st.markdown(f"- {alert}")
     else:
         st.info("Nessun alert generato oggi.. analizza le partite")
+
 
 # Footer
 st.divider()
