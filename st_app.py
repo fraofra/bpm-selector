@@ -228,6 +228,7 @@ partite_oggi = get_partite_oggi()
 
 
 # --- Carica le squadre ---
+@st.cache_data(ttl=24*60*60)
 def get_teams(lega):
     lega = lega.replace(" ","_").lower()
     try:
@@ -243,6 +244,7 @@ if lega_selezionata:
     teams = get_teams(lega_selezionata)
 
 # --- Analisi di tutte le squadre ---
+@st.cache_data(ttl=24*60*60)
 def analizza_squadra(team, lega):
     league_encoded = urllib.parse.quote(lega)
     team_encoded = urllib.parse.quote(team)
@@ -332,7 +334,8 @@ def analizza_squadra(team, lega):
 def poisson(k, lam):
     """Probabilità Poisson per k eventi con media lam"""
     return (lam ** k) * exp(-lam) / factorial(k)
-
+    
+@st.cache_data(ttl=24*60*60)
 def calcola_quote_poisson(home_team, away_team, campionato):
     # Recupero info dal tuo sistema (presumo già connesso a DB)
     home_info = get_info(home_team, campionato)
@@ -410,12 +413,11 @@ def calcola_quote_poisson(home_team, away_team, campionato):
     risultato += f"\n{risulta_piu}\n"   
 
     return risultato    
-
+# --- Calcolo Statistiche per quote calcola_poisson ---    
+@st.cache_data(ttl=24*60*60)
 def get_info(team, lega):
     league_encoded = urllib.parse.quote(lega)
     team_encoded = urllib.parse.quote(team)
-
-
     url = f"{API_STATS}{league_encoded}/{team_encoded}"
     try:
         response = requests.get(url)
@@ -429,8 +431,7 @@ def get_info(team, lega):
 
         match_count = len(matches)
         scored = 0
-        conceded = 0
-       
+        conceded = 0       
 
         matches = matches[::-1]  # Ordina dalla più recente
 
@@ -442,8 +443,7 @@ def get_info(team, lega):
 
             is_home = (team == home)
             is_away = (team == away)
-
-
+            
             if is_home:
                 scored += fthg
                 conceded += ftag
