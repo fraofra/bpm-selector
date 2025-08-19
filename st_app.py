@@ -9,6 +9,9 @@ API_LEAGUES = f"{API_BASE}/leagues"
 API_TEAMS = f"{API_BASE}/teams/"
 API_STATS = f"{API_BASE}/stats/"
 
+# --- Stato iniziale per gli alert ---
+if "alert_list" not in st.session_state:
+    st.session_state.alert_list = []
 
 st.set_page_config(page_title="BPM - Limited Chicchette", layout="centered")
 st.title("⚽ BPM Selector")
