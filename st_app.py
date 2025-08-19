@@ -133,19 +133,33 @@ hr {
 """, unsafe_allow_html=True)
 
 
-# --- Carica le leghe (session_state invece di cache_data) ---
+# # --- Carica le leghe (session_state invece di cache_data) ---
+# def carica_leghe():
+#     if "leagues" not in st.session_state:
+#         try:
+#             response = requests.get(API_LEAGUES)
+#             response.raise_for_status()
+#             leagues = response.json().get("leagues", [])
+#             leagues = [league.replace("_", " ").title() for league in leagues]
+#             st.session_state.leagues = sorted(leagues)
+#         except Exception as e:
+#             st.error(f"Errore nel caricamento delle leghe: {e}")
+#             st.session_state.leagues = []
+#     return st.session_state.leagues
+
+# --- Carica le leghe (cache condivisa, aggiornata ogni 24h) ---
+@st.cache_data(ttl=60*60*24)  # 24 ore
 def carica_leghe():
-    if "leagues" not in st.session_state:
-        try:
-            response = requests.get(API_LEAGUES)
-            response.raise_for_status()
-            leagues = response.json().get("leagues", [])
-            leagues = [league.replace("_", " ").title() for league in leagues]
-            st.session_state.leagues = sorted(leagues)
-        except Exception as e:
-            st.error(f"Errore nel caricamento delle leghe: {e}")
-            st.session_state.leagues = []
-    return st.session_state.leagues
+    try:
+        response = requests.get(API_LEAGUES)
+        response.raise_for_status()
+        leagues = response.json().get("leagues", [])
+        leagues = [league.replace("_"," ").title() for league in leagues]        
+        return sorted(leagues)
+    except Exception as e:
+        st.error(f"Errore nel caricamento delle leghe: {e}")
+        return []
+
 
 
 leagues = carica_leghe()
