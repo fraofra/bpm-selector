@@ -167,34 +167,64 @@ leagues = carica_leghe()
 lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 
-# --- Recupera le partite di oggi (session_state invece di cache_data) ---
+# # --- Recupera le partite di oggi (session_state invece di cache_data) ---
+# def get_partite_oggi():
+#     if "partite_oggi" not in st.session_state:
+#         try:
+#             response = requests.get("https://daily-python-script.onrender.com/next")
+#             response.raise_for_status()
+#             dati = response.json()
+#             match_list = dati.get("next_matches", [])
+
+#             oggi = datetime.now().strftime("%d.%m.")
+
+#             st.session_state.partite_oggi = [
+#                 {
+#                     "home_team": match["home_team"],
+#                     "away_team": match["away_team"],
+#                     "league": match["league"],
+#                     "ora": match["date"]
+#                 }
+#                 for match in match_list
+#                 if match.get("date", "").startswith(oggi)
+#             ]
+#         except Exception as e:
+#             st.error(f"Errore nel recupero delle partite odierne: {e}")
+#             st.session_state.partite_oggi = []
+#     return st.session_state.partite_oggi
+
+
+# partite_oggi = get_partite_oggi()
+# --- Recupera le partite di oggi (cache_data 12h) ---
+@st.cache_data(ttl=60*60*12)  # 12 ore
 def get_partite_oggi():
-    if "partite_oggi" not in st.session_state:
-        try:
-            response = requests.get("https://daily-python-script.onrender.com/next")
-            response.raise_for_status()
-            dati = response.json()
-            match_list = dati.get("next_matches", [])
+    try:
+        response = requests.get("https://daily-python-script.onrender.com/next")
+        response.raise_for_status()
+        dati = response.json()
+        match_list = dati.get("next_matches", [])
 
-            oggi = datetime.now().strftime("%d.%m.")
+        oggi = datetime.now().strftime("%d.%m.")
 
-            st.session_state.partite_oggi = [
-                {
-                    "home_team": match["home_team"],
-                    "away_team": match["away_team"],
-                    "league": match["league"],
-                    "ora": match["date"]
-                }
-                for match in match_list
-                if match.get("date", "").startswith(oggi)
-            ]
-        except Exception as e:
-            st.error(f"Errore nel recupero delle partite odierne: {e}")
-            st.session_state.partite_oggi = []
-    return st.session_state.partite_oggi
+        partite_oggi = [
+            {
+                "home_team": match["home_team"],
+                "away_team": match["away_team"],
+                "league": match["league"],
+                "ora": match["date"]
+            }
+            for match in match_list
+            if match.get("date", "").startswith(oggi)
+        ]
+
+        return partite_oggi
+    except Exception as e:
+        st.error(f"Errore nel recupero delle partite odierne: {e}")
+        return []
 
 
 partite_oggi = get_partite_oggi()
+
 
 
 # --- Carica le squadre ---
