@@ -477,7 +477,7 @@ if "show_today_analysis" not in st.session_state:
 
 if st.button(" 📊 Analizza le partite di oggi"):
     st.session_state.show_today_analysis = not st.session_state.show_today_analysis
-    st.session_state.alert_list = []  # reset alert all'avvio
+    # st.session_state.alert_list = []  # reset alert all'avvio
 
 if st.session_state.show_today_analysis:
     partite = get_partite_oggi()
@@ -571,6 +571,6 @@ if st.session_state.show_alerts:
 st.divider()
 st.markdown("""
     <center>
-    <small>Made with ❤️ for BasePizza • </small>
+    <small>Made with ❤️ for • BasePizza • </small>
     </center>
 """, unsafe_allow_html=True)
