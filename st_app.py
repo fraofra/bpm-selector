@@ -37,7 +37,6 @@ h1 {
 
 /* Expander stile card */
 .streamlit-expander {
-
     margin-bottom: 12px;
     background-color: rgba(255,255,255,0.03);
     box-shadow: 0 4px 10px rgba(0,255,136,0.15);
@@ -90,7 +89,7 @@ div[data-baseweb="select"]:hover {
 ul {
     background-color: #1e2a30 !important;
     border-radius: 10px;
-    border: 1px solid #00ff88;
+    /*border: 1px solid #00ff88;*/
 }
 ul li {
     color: #f8f9fa !important;
@@ -150,7 +149,7 @@ hr {
 #     return st.session_state.leagues
 
 # --- Carica le leghe (cache condivisa, aggiornata ogni 24h) ---
-@st.cache_data(ttl=60*60*24)  # 24 ore
+@st.cache_data(ttl=60*60*12)  # 24 ore
 def carica_leghe():
     try:
         response = requests.get(API_LEAGUES)
@@ -198,7 +197,7 @@ lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 # partite_oggi = get_partite_oggi()
 # --- Recupera le partite di oggi (cache_data 12h) ---
-@st.cache_data(ttl=60*60*12)  # 12 ore
+@st.cache_data(ttl=12*60*60)  # 12 ore
 def get_partite_oggi():
     try:
         response = requests.get("https://daily-python-script.onrender.com/next")
@@ -246,7 +245,7 @@ if lega_selezionata:
     teams = get_teams(lega_selezionata)
 
 # --- Analisi di tutte le squadre ---
-@st.cache_data(ttl=24*60*60)
+@st.cache_data(ttl=12*60*60)
 def analizza_squadra(team, lega):
     league_encoded = urllib.parse.quote(lega)
     team_encoded = urllib.parse.quote(team)
@@ -312,7 +311,7 @@ def analizza_squadra(team, lega):
             else:
                 consecutivi_non_subisce = 0
 
-        message += f"\n- Partite giocate: {match_count}\n- Fatti: {scored} | Subiti: {conceded}\n- W: {win} | L: {lose} | D: {draw}\n"
+        message += f"\n***{team}***\n- Partite giocate: {match_count}\n- Fatti: {scored} | Subiti: {conceded}\n- W: {win} | L: {lose} | D: {draw}\n"
 
         if consecutivi_non_segna > 0:
             message += f"\n- Non segna da {consecutivi_non_segna} (Max: {max_non_segna})\n"
@@ -323,10 +322,10 @@ def analizza_squadra(team, lega):
 
         if consecutivi_non_segna == max_non_segna and max_non_segna > 0:
             message += f"\n ⚠️ Mai più di {max_non_segna} partite senza segnare\n"
-            st.session_state.alert_list.append(f"{lega_txt} - {team}\n ⚠️ Limite non segna ({max_non_segna} in {match_count} partite)\n")
+            st.session_state.alert_list.append(f"\n{lega_txt} - {team}\n ⚠️ Limite non segna ({max_non_segna} in {match_count} partite)\n")
         if consecutivi_non_subisce == max_non_subisce and max_non_subisce > 0:
             message += f"\n ⚠️ Mai più di {max_non_subisce} clean sheet\n"
-            st.session_state.alert_list.append(f"{lega_txt} - {team}\n ⚠️ Limite non subisce ({max_non_subisce} in {match_count} partite)\n")
+            st.session_state.alert_list.append(f"\n{lega_txt} - {team}\n ⚠️ Limite non subisce ({max_non_subisce} in {match_count} partite)\n")
 
         return message
     except Exception as e:
@@ -337,7 +336,7 @@ def poisson(k, lam):
     """Probabilità Poisson per k eventi con media lam"""
     return (lam ** k) * exp(-lam) / factorial(k)
     
-@st.cache_data(ttl=24*60*60)
+@st.cache_data(ttl=12*60*60)
 def calcola_quote_poisson(home_team, away_team, campionato):
     # Recupero info dal tuo sistema (presumo già connesso a DB)
     home_info = get_info(home_team, campionato)
@@ -416,7 +415,7 @@ def calcola_quote_poisson(home_team, away_team, campionato):
 
     return risultato    
 # --- Calcolo Statistiche per quote calcola_poisson ---    
-@st.cache_data(ttl=24*60*60)
+@st.cache_data(ttl=12*60*60)
 def get_info(team, lega):
     league_encoded = urllib.parse.quote(lega)
     team_encoded = urllib.parse.quote(team)
@@ -506,9 +505,9 @@ if st.session_state.show_today_analysis:
                         st.session_state[f"{key_match}_away"] = away_analysis
                         st.session_state[key_match] = True
 
-                st.markdown(f"***{home}***")
+                # st.markdown(f"***{home}***")
                 st.markdown(st.session_state.get(f"{key_match}_home", "Nessun dato"))
-                st.markdown(f"***{away}***")
+                # st.markdown(f"***{away}***")
                 st.markdown(st.session_state.get(f"{key_match}_away", "Nessun dato"))
 
 
