@@ -149,7 +149,7 @@ hr {
 #     return st.session_state.leagues
 
 # --- Carica le leghe (cache condivisa, aggiornata ogni 24h) ---
-@st.cache_data(ttl=60*60*12)  # 24 ore
+# @st.cache_data(ttl=60*60*12)  # 24 ore
 def carica_leghe():
     try:
         response = requests.get(API_LEAGUES)
@@ -197,7 +197,7 @@ lega_selezionata = st.selectbox("Seleziona il Campionato", leagues)
 
 # partite_oggi = get_partite_oggi()
 # --- Recupera le partite di oggi (cache_data 12h) ---
-@st.cache_data(ttl=12*60*60)  # 12 ore
+# @st.cache_data(ttl=12*60*60)  # 12 ore
 def get_partite_oggi():
     try:
         response = requests.get("https://daily-python-script.onrender.com/next")
@@ -229,7 +229,7 @@ partite_oggi = get_partite_oggi()
 
 
 # --- Carica le squadre ---
-@st.cache_data(ttl=24*60*60)
+# @st.cache_data(ttl=24*60*60)
 def get_teams(lega):
     lega = lega.replace(" ","_").lower()
     try:
@@ -245,7 +245,7 @@ if lega_selezionata:
     teams = get_teams(lega_selezionata)
 
 # --- Analisi di tutte le squadre ---
-@st.cache_data(ttl=12*60*60)
+# @st.cache_data(ttl=12*60*60)
 def analizza_squadra(team, lega):
     league_encoded = urllib.parse.quote(lega)
     team_encoded = urllib.parse.quote(team)
@@ -336,7 +336,7 @@ def poisson(k, lam):
     """Probabilità Poisson per k eventi con media lam"""
     return (lam ** k) * exp(-lam) / factorial(k)
     
-@st.cache_data(ttl=12*60*60)
+# @st.cache_data(ttl=12*60*60)
 def calcola_quote_poisson(home_team, away_team, campionato):
     # Recupero info dal tuo sistema (presumo già connesso a DB)
     home_info = get_info(home_team, campionato)
@@ -415,7 +415,7 @@ def calcola_quote_poisson(home_team, away_team, campionato):
 
     return risultato    
 # --- Calcolo Statistiche per quote calcola_poisson ---    
-@st.cache_data(ttl=12*60*60)
+# @st.cache_data(ttl=12*60*60)
 def get_info(team, lega):
     league_encoded = urllib.parse.quote(lega)
     team_encoded = urllib.parse.quote(team)
