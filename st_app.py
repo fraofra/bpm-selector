@@ -561,7 +561,7 @@ if st.session_state.show_alerts:
     if st.session_state.alert_list:
         st.subheader("⚠️ Alert generati oggi")
         for alert in st.session_state.alert_list:
-            st.markdown(f"- {alert}")
+            st.markdown(f"\n{alert}\n")
     else:
         st.info("Nessun alert generato oggi.. analizza le partite")
 
